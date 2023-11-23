@@ -1,0 +1,6 @@
+DELETE FROM mesic1;
+DELETE FROM mesic3;
+
+
+SELECT DISTINCT mesic1.cislo1, mesic1.nazev1, mesic3.cislo3, mesic3.nazev3 FROM mesic1 INNER JOIN mesic3 ON mesic1.cislo1 = mesic3.cislo3 WHERE mesic1.nazev1 != mesic3.nazev3; 
+

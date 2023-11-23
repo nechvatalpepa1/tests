@@ -1,0 +1,100 @@
+CREATE TABLE `pe_tyden_dny`.`mesic1` (`cislo1` VARCHAR(15) NOT NULL , `nazev1` VARCHAR(40) NOT NULL) ENGINE = InnoDB;
+CREATE TABLE `pe_tyden_dny`.`mesic3` (`cislo3` VARCHAR(15) NOT NULL , `nazev3` VARCHAR(40) NOT NULL) ENGINE = InnoDB;
+
+-- 1. EXCEL uložit jako CSV utf-8 (odděleno středníkem)
+-- 2. soubor CSV otevřít v poznámkovém bloku
+-- 3. přepsat všechny "," na " "
+-- 4. pak přepsat všechny ";" na ","
+-- 5. uložit
+
+-- zde je začátek kódu
+-- změněná
+DELETE FROM mesic1;
+DELETE FROM mesic3;
+--
+
+
+DECLARE done INT DEFAULT FALSE;
+DECLARE cislo1 VARCHAR(15);
+DECLARE cur CURSOR FOR SELECT cislo1 FROM mesic1;
+OPEN cur;
+FETCH cur INTO cislo1;
+WHILE done = FALSE DO
+    IF @@FETCH_STATUS <> 0 THEN
+        SET done = TRUE;
+    ELSE
+        INSERT INTO vyhodnoceni (cislo_por) SELECT cislo1 FROM mesic1 WHERE EXISTS (SELECT * FROM mesic3 WHERE mesic3.cislo3 = mesic1.cislo1);
+        FETCH cur INTO cislo1;
+    END IF;
+END WHILE;
+CLOSE cur;
+DEALLOCATE cur;
+RETURN
+
+
+
+-- ZALOHA
+DELIMITER $$
+CREATE PROCEDURE vyhodnoceni_procedure()
+BEGIN
+
+DROP TABLE vyhodnoceni;
+
+-- vytvoří porovnávací tabulku
+CREATE TABLE `vyhodnoceni` (
+   cislo_por VARCHAR(15) NOT NULL,
+   nazev_por VARCHAR(40) NULL 
+);
+-- vytvoření cyklu
+-- @i je načítací proměnná
+-- @cnt načte z COUNT(*) počet řádků v databázi
+
+-- SET @i = 1;
+-- SELECT COUNT(*) INTO @cnt FROM tabulka1;
+
+
+-- ověření nalezení čísla dílu
+DECLARE cislo1 VARCHAR(15);
+DECLARE cur CURSOR FOR SELECT cislo1 FROM mesic1;
+OPEN cur;
+FETCH NEXT FROM cur INTO cislo1;
+
+WHILE @@FETCH_STATUS = 0 DO
+   -- zde provádíme operace s řádky tabulky1
+   -- vkládní obsahu cyklu
+   INSERT INTO vyhodnoceni (cislo_por) SELECT cislo1 FROM mesic1 WHERE EXISTS (SELECT * FROM mesic3 WHERE mesic3.cislo3 = mesic1.cislo1);
+   FETCH NEXT FROM cur INTO cislo1;
+   -- SET @i = @i + 1;
+END WHILE;
+CLOSE cur;
+DEALLOCATE cur;
+
+END$$
+DELIMITER;
+
+-- Spuštění uložené procedury
+CALL vyhodnoceni_procedure();
+
+
+-- ověření shody názvu
+DECLARE cislo VARCHAR(15);
+DECLARE cur CURSOR FOR SELECT cislo FROM vyhodnoceni;
+OPEN cur;
+FETCH NEXT FROM cur INTO cislo;
+
+WHILE @@FETCH_STATUS = 0 DO
+   -- zde provádíme operace s řádky tabulky1
+   -- vkládní obsahu cyklu
+   INSERT INTO vyhodnoceni (nazev_por) SELECT nazev1 FROM mesic1 WHERE EXISTS (SELECT * FROM mesic3 WHERE mesic3.nazev3 <> mesic1.nazev1);
+   FETCH NEXT FROM cur INTO cislo;
+   -- SET @i = @i + 1;
+END WHILE;
+CLOSE cur;
+DEALLOCATE cur;
+
+
+
+
+
+DELETE FROM mesic1 WHERE `mesic1`.`Id` > 11
+
