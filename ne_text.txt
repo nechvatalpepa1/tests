@@ -1,2 +1,5 @@
 ne_text.txt
-tento soubor jsem nepřidal
+toto je blbost
+nic jsem neopravil
+tento soubor jsem nepřidal 
+toto je správně
