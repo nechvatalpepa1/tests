@@ -1,5 +1,5 @@
 ne_text.txt
-toto je blbost
+toto je 
 nic jsem neopravil
-tento soubor jsem nepřidal 
-toto je správně
+1 tento soubor jsem nepřidal 
+toto je správně 2
